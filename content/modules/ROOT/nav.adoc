@@ -9,6 +9,6 @@
 ** xref:serving-at-scale/maas/index.adoc[Models as a Service]
 *** xref:serving-at-scale/maas/maas-lab.adoc[Lab: Models as a Service]
 
-** xref:ai-agentic/index.adoc[AI Agents]
+* xref:ai-agentic/index.adoc[AI Agents]
 
-** xref:llm-optimization-and-inference/index.adoc[LLM Optimization and Inference]
+* xref:llm-optimization-and-inference/index.adoc[LLM Optimization and Inference]
