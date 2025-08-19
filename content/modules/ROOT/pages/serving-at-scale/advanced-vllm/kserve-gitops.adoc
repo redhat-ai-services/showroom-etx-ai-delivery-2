@@ -1,0 +1,174 @@
+= GitOps with KServe
+
+Up to this point, we have been primarily using the OpenShift AI Dashboard to deploy our models.  While this is a great way to get started, it does not allow us to utilize the full capabilities of KServe, or manage our models using standard GitOps practices that may be required for a production environment.
+
+TIP: For a deeper dive on more GitOps capabilities with OpenShift AI, see the https://ai-on-openshift.io/odh-rhoai/gitops/#model-serving[AI on OpenShift GitOps] page.
+
+== KServe Objects
+
+KServe uses two primary objects to manage model serving:
+
+* InferenceService
+* ServingRuntime
+
+The InferenceService object is used to define the model and any model specific configurations to serve that model, and the ServingRuntime object is used to define the runtime environment for the model.
+
+OpenShift AI generally assumes a one to one relationship between an InferenceService and a ServingRuntime, but a ServingRuntime can be configured to be used by multiple InferenceServices.
+
+== vLLM KServe Helm Chart
+
+To help manage the deployment of vLLM, a Helm chart is available from Red Hat Services that can be used to help deploy a vLLM instance using KServe:
+
+https://github.com/redhat-ai-services/helm-charts/tree/main/charts/vllm-kserve
+
+The chart can be used to deploy an instance using vLLM and exposes many features that are not available when using the OpenShift AI Dashboard.
+
+=== Using the Helm Chart with GitOps
+
+While the Helm chart itself is not true GitOps, it does get us one step closer to being able to manage our models using GitOps practices.  With the Helm chart we can easily use ArgoCD's native Helm support to deploy the chart with a values.yaml file, or we can use something like Kustomize to help inflate the chart:
+
+[source,yaml]
+----
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+helmCharts:
+- name: vllm-kserve
+  releaseName: my-llm-server
+  version: 0.5.9
+  repo: https://redhat-ai-services.github.io/helm-charts/
+  valuesFile: values.yaml
+----
+
+With this configuration we can point an ArgoCD application directly at the Kustomize configuration and have it deploy the chart with the values.yaml file.
+
+For more options for how to deploy Helm Charts with ArgoCD, take a look at the blog post: https://developers.redhat.com/articles/2023/05/25/3-patterns-deploying-helm-charts-argocd
+
+== Lab: Deploy Additional Models with Helm
+
+In this lab, we will deploy the final LLM we need for the later Llama-stack labs.  This time, we will use the Helm chart from above to deploy the model.
+
+NOTE: If you don't already have Helm installed, please refer to the official documentation: https://helm.sh/docs/intro/install/
+
+. To begin, we will add the Red Hat AI Services Helm repository to our Helm client and pull the latest charts:
+
++
+[source,bash,role="execute"]
+----
+helm repo add redhat-ai-services https://redhat-ai-services.github.io/helm-charts/
+helm repo update redhat-ai-services
+----
+
+. Next, we will update our Helm client to pull the latest charts from the repository:
+
++
+[source,bash,role="execute"]
+----
+helm upgrade -i granite-guardian redhat-ai-services/vllm-kserve --version 0.5.9 \
+  --set fullnameOverride="granite-guardian" \
+  --set image.tag="rhoai-2.22-cuda" \
+  --set model.uri="oci://quay.io/redhat-ai-services/modelcar-catalog:granite-guardian-3.2-5b" \
+  --set model.args={"--max-model-len=20000"} \
+  --set deploymentMode=RawDeployment \
+  --set scaling.rawDeployment.deploymentStrategy.type=Recreate
+----
+
++
+`fullnameOverride` is used to override the default name of the deployment.  Helm charts usually default to using a combination of the release name and the chart name to create the name of the deployment.  In this case, we are using the release name `granite-guardian` and ignoring we want to skip including the chart name in the deployment.
+
++
+`image.tag` is used to define the tag of the vLLM image to use.  This is an optional setting, but can help to ensure that we are using the same version of vLLM that is being used when we deploy using the OpenShift AI Dashboard.
+
++
+`model.uri` is used to define the model to be served from an existing OCI container.
+
++
+`model.args` is used to define any model specific arguments to be passed to the model.  In this case, we are setting the `--max-model-len` to 20000 to limit the context length of the model in order to allow it to fit our our GPU.
+
++
+`deploymentMode` is used to define the deployment mode we want KServe to use.  Setting this option to `RawDeployment` allows us to deploy the model without the ServiceMesh/Serverless.
+
++
+`scaling.rawDeployment.deploymentStrategy.type` will allow us to set the deployment strategy to `Recreate` which will allow us to make updates to the model in the future by first deleting the existing deployment and then creating a new one.  This option is generally not recommended for production environments as it can cause downtime for the model, but it is useful for us since we have a limited number of GPUs and we don't need to worry about downtime.
+
+. To verify that the deployment was successful, check that the pod successfully started and is in the ready state.
+
+== Optional Lab: Redeploy previous models with GitOps
+
+In our previous lab sections, we deployed our models using the OpenShift AI Dashboard.  While this is a great way to get started, it doesn't allow us to easily manage our models using GitOps practices.
+
+. Helm will not allow us to redeploy the same model with the same name, so we will need to delete the existing InferenceService and ServingRuntime.
+
++
+[source,bash,role="execute"]
+----
+oc delete inferenceservice granite-8b
+oc delete servingruntime granite-8b
+----
+
++
+[TIP]
+====
+If you want to redeploy the objects with Helm without downtime or deleting the existing objects, you can manually add the necessary labels/annotations to the objects that helm complains about when running the `helm upgrade` or `helm install` commands.
+
+Run the `helm upgrade` command to see the errors and what labels/annotations are required to be added to the objects.
+
+If you are updating the objects using ArgoCD, these manually changes should not be necessary.
+====
+
+. Next, we can deploy the model with the same options we used in the previous lab.
+
++
+[source,bash,role="execute"]
+----
+helm upgrade -i granite-8b redhat-ai-services/vllm-kserve --version 0.5.9 \
+  --set fullnameOverride="granite-8b" \
+  --set image.tag="rhoai-2.22-cuda" \
+  --set model.uri="oci://quay.io/redhat-ai-services/modelcar-catalog:granite-3.3-8b-instruct" \
+  --set 'resources.requests.cpu=4' \
+  --set 'resources.limits.cpu=8' \
+  --set 'resources.requests.memory=8Gi' \
+  --set 'resources.limits.memory=16Gi' \
+  --set 'resources.requests.nvidia\.com/gpu=2' \
+  --set 'resources.limits.nvidia\.com/gpu=2'  \
+  --set model.args={"--tensor-parallel-size=2"}
+----
+
++
+Monitor the pod logs to ensure that the pod successfully starts.
+
+. The same helm chart also supports Mutli-node deployments, however, it is recommended to only use the multi-node deployment configuration with OpenShift AI 2.22 or later.
+
++
+Use the helm chart documentation to help construct a `helm upgrade` command that would allow us to create the same configuration with the helm chart that we deployed in the Multi-node vLLM lab.  You can find documentation for all of the available options on the GitHub repo here:
+
++
+https://github.com/redhat-ai-services/helm-charts/tree/main/charts/vllm-kserve
+
++
+Just like before, you will need to delete the existing InferenceService and ServingRuntime before running the `helm upgrade` command.
+
++
+Refer to the answer below to compare your crafted command with the correct one.
+
+
+=== Multi-node vLLM Solution
+[%collapsible]
+====
+```
+helm upgrade -i vllm-multi-node-llama redhat-ai-services/vllm-kserve --version 0.5.9 \
+  --set fullnameOverride="vllm-multi-node-llama" \
+  --set image.tag="rhoai-2.22-cuda" \
+  --set model.uri="pvc://llama-model/Llama-3.3-70B-Instruct-quantized.w4a16" \
+  --set servingTopology=multiNode \
+  --set deploymentMode=RawDeployment \
+  --set multiNode.pipelineParallelSize=2 \
+  --set multiNode.tensorParallelSize=2 \
+  --set 'resources.requests.cpu=4' \
+  --set 'resources.limits.cpu=8' \
+  --set 'resources.requests.memory=8Gi' \
+  --set 'resources.limits.memory=16Gi' \
+  --set 'resources.requests.nvidia\.com/gpu=2' \
+  --set 'resources.limits.nvidia\.com/gpu=2'
+```
+====

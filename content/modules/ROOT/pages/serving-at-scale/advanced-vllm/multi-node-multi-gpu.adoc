@@ -1,0 +1,241 @@
+= Deploying a Model with vLLM on a multiple node with multiple GPUs
+
+We have successfully deployed vLLM on a single node with multiple GPUs, the natural next step is going to deploy a vLLM instance over multiple nodes with multiple GPUs.
+
+== Multi-node vLLM Overview
+
+Multi-node vLLM is a powerful tool for deploying larger models that won't fit on the GPUs available in a single node.
+
+For example, a node with 8x H100 (80Gb vRAM each) has a total of 640Gb of vRAM.  An un-quantized version of Llama 405b requires approximately 900Gb of vRAM just to load the model (not factoring in the KV Cache requirements) so the model must be broken up across multiple nodes.
+
+Multi-node vLLM enables us to start multiple pods with a `head` node and additional `worker` nodes.  The `head` will act as the main vLLM server, and both the model and KV Cache will be distributed across the nodes.
+
+Multi-node instances do not have all of the same capabilities as a single node instance.  For example, multi-node instances are only available as `Standard` (aka RawDeployment) and not `Advanced` (aka Serverless).  Additionally, multi-node instances only support serving models from a ReadWriteMany (RWX) PVC or a ModelCar image.  They do not support serving models directly from an S3 bucket.
+
+== Lab: Deploying a Multi-node vLLM Instance
+
+In this section we will deploy a multi-node vLLM instance with two nodes, each with two GPUs.
+
+For this lab, we will continue to use the `vllm` namespace.
+
+[NOTE]
+====
+Multi-node vLLM is a Tech Preview feature and is not supported in the OpenShift AI Dashboard.  For this lab, we will be deploying the vLLM instance using the CLI.
+====
+
+[TIP]
+====
+Refer to the official documentation for more information on how to deploy a multi-node vLLM instance: https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/2.22/html-single/serving_models/index#deploying-models-using-multiple-gpu-nodes_serving-large-models
+====
+
+. To start, we need to process and deploy a template from the ```redhat-ods-applications``` project:
+
++
+[source,shell,role="execute"]
+----
+oc process vllm-multinode-runtime-template -n redhat-ods-applications | oc apply -n vllm -f -
+----
+
+[TIP]
+====
+The OpenShift AI Dashboard provides several out of the box "Serving Runtimes" for different models servers.  These can be found in the "Serving Runtimes" section in the OpenShift AI Dashboard under "Settings" if you are an Admin.  These "Serving Runtimes" are OpenShift Templates similar to the one we use above.  These templates container a copy of a `ServingRuntime` object and when using the UI to deploy a model the template is processed to create a `ServingRuntime` object in the namespace.
+====
+
+. Processing the template will create a `ServingRuntime` object in the `vllm` namespace called `vllm-multinode-runtime`.  Take a moment and explore the ServingRuntime to see what it contains:
+
++
+[source,shell,role="execute"]
+----
+oc get servingruntime vllm-multinode-runtime -n vllm -o yaml
+----
+
+[NOTE]
+====
+As of 2.22 the `ServingRuntime` object must be named `vllm-multinode-runtime` in order for the odh-model-controller to automatically setup the Ray TLS certs needed for multi-node deployments.  In newer versions of RHOAI any name can be used for the model server.
+====
+
+. We have already created a ReadWriteMany (RWX) PVC for the model in the `vllm` namespace and loaded https://huggingface.co/RedHatAI/Llama-3.3-70B-Instruct-quantized.w4a16[Llama-3.3-70B-Instruct-quantized.w4a16] into it.  Take a moment to review the PVC:
+
++
+[source,shell,role="execute"]
+----
+oc get pvc llama-model -n vllm
+oc describe pvc llama-model -n vllm
+----
+
+[NOTE]
+====
+Multi-node vLLM supports both `ReadWriteMany` PVCs and ModelCar images for serving.  S3 buckets are not supported for multi-node deployments.
+
+ReadWriteOnce PVCs are not supported for multi-node deployments since the PVC must be mounted to both the `head` and `worker` pods.
+====
+
+. Next, we will need to create the `InferenceService` object that will be used to serve the model.  Copy the following YAML into a file and create it on the cluster using `oc apply` or copy and paste it into the OpenShift Web Console using the `+` button in the top right corner of the screen.
+
++
+[source,shell,role="execute"]
+----
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  annotations:
+    serving.kserve.io/autoscalerClass: external
+    serving.kserve.io/deploymentMode: RawDeployment # 1
+  labels:
+    networking.kserve.io/visibility: exposed # 2
+  name: vllm-multi-node-llama
+spec:
+  predictor:
+    minReplicas: 1
+    model:
+      args: # 3
+        - --max-model-len=100000
+      modelFormat:
+        name: vLLM
+      name: ""
+      resources:
+        limits:
+          cpu: "8"
+          memory: 12Gi
+          nvidia.com/gpu: "2"
+        requests:
+          cpu: "4"
+          memory: 8Gi
+          nvidia.com/gpu: "2"
+      runtime: vllm-multinode-runtime
+      storageUri: pvc://llama-model/Llama-3.3-70B-Instruct-quantized.w4a16 # 4
+    tolerations:
+      - effect: NoSchedule
+        key: nvidia.com/gpu
+        operator: Exists
+    workerSpec:
+      containers:
+        - name: worker-container
+          resources:
+            limits:
+              cpu: "8"
+              memory: 12Gi
+              nvidia.com/gpu: "2"
+            requests:
+              cpu: "4"
+              memory: 8Gi
+              nvidia.com/gpu: "2"
+      pipelineParallelSize: 2 # 5
+      tensorParallelSize: 2 # 6
+      tolerations:
+        - effect: NoSchedule
+          key: nvidia.com/gpu
+          operator: Exists
+----
+
++
+1. Multi-node vLLM is only available as `RawDeployment` mode and not `Serverless` mode.
+2. The `exposed` label tells KServe to create a Route to expose the model outside of the cluster.
+3. The `args` section is used to set additional arguments needed to help start the model.  In our case, we are limiting the sizing of the KV Cache to 100,000 tokens to allow it to fit on the GPUs in our multi-node setup.
+4. The `storageUri` section is used to provide details of where our model exists.  In this case our pvc is named `llama-model` and the folder container the model is `Llama-3.3-70B-Instruct-quantized.w4a16`.
+5. The `pipelineParallelSize` section is used to set the number worker pods that will be created to serve the model.
+6. The `tensorParallelSize` section is used to define the number of GPUs available to each worker pod.
+
+. Once the `InferenceService` is created, we can see the two new pods that have been created.  The `vllm-multi-node-llama-predictor-head-<hash>` pod is the `head` node and the `vllm-multi-node-llama-predictor-worker-<hash>` pod is the `worker` node.
+
++
+[source,shell,role="execute"]
+----
+oc get pods -n vllm
+----
+
++
+Alternatively, you can use the `watch` command or flag to follow the status of the pods.
+
++
+[source,shell,role="execute"]
+----
+watch oc get pods -n vllm
+----
+
++
+or
+
++
+[source,shell,role="execute"]
+----
+oc get pods -n vllm --watch
+----
+
+. Check the logs of both the `head` and `worker` pods.  You should see a `ray` cluster starting in the `head` pod followed by some logs from vllm starting up.  In the `worker` you will see a the `ray` instance starting and the worker pod will join the cluster.
+
++
+Head logs:
+
++
+image::serving-at-scale/advanced-vllm/multinode-head-logs.png[Multi-node Head Logs]
+
++
+Worker logs:
+
++
+image::serving-at-scale/advanced-vllm/multinode-worker-logs.png[Multi-node Worker Logs]
+
++
+[NOTE]
+====
+The multi-node vLLM instance uses Ray as part of the backend to manage the communication between the pods.  vLLM is responsible for managing our Ray cluster for us as part of the deployment and it does not use any of OpenShift AI's Distributed Compute capabilities with CodeFlare and KubeRay.
+
+Additionally, the multi-node vLLM should not be confused with https://docs.ray.io/en/latest/serve/index.html[Ray Serve], which is a ray based serving framework for predictive models.
+====
+
+== Lab: Testing the Multi-node vLLM Instance
+
+. Once all of our pods have gone to a fully `Ready` state, we can test the model by sending a request to the `head` pod's endpoint.  We can do this by using the `curl` command to send a request to the `head` pod's endpoint.  First, we will get the route for the vllm endpoint.
+
++
+[source,shell,role="execute"]
+----
+oc get route vllm-multi-node-llama -n vllm -o jsonpath='{.spec.host}'
+----
+
+. Next we will use the route URL to perform a curl request to get the name of the model form the models endpoint.
+
++
+[source,shell,role="execute"]
+----
+curl https://vllm-multi-node-llama-vllm.{openshift_cluster_ingress_domain}/v1/models
+----
+
+. Next, we can use curl to send a prompt to the model.  We will use the `-d` option to send a JSON payload to the model.
+
++
+[source,shell,role="execute"]
+----
+curl -X POST https://vllm-multi-node-llama-vllm.{openshift_cluster_ingress_domain}/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -d '{
+      "model": "vllm-multi-node-llama",
+      "prompt": "Write a function in Python that determines if a number is prime.  Explain your approach.  Follow the PEP 8 style guide.",
+      "max_tokens": 500
+    }'
+----
+
++
+[TIP]
+====
+If you are working with a model that has a secured endpoint, you can add the `Authorization` header to the curl request.
+
+[source,shell]
+----
+-H "Authorization: Bearer <YOUR_TOKEN>"
+----
+
+You can generate a token through the OpenShift AI Dashboard, or use any user/sevice account token that has view permissions on the `InferenceService` object.
+
+To get your OpenShift user token, you can use the following command:
+
+[source,shell]
+----
+oc whoami --show-token
+----
+====
+
+== Conclusion
+
+Congratulations!  You have successfully deployed a model with vLLM on a multi-node with multiple GPUs.

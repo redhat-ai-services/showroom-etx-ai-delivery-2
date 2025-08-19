@@ -1,1 +1,5 @@
 = Advanced vLLM
+
+In this section, we will explore some of the advanced capabilities of vLLM.
+
+We will deploy a vLLM instance with multiple GPUs and a vLLM instance with multiple nodes.

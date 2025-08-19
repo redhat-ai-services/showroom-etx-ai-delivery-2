@@ -1,0 +1,64 @@
+<mxfile host="65bd71144e">
+    <diagram id="qwqJSfi9unMYo62wrURM" name="Page-1">
+        <mxGraphModel dx="547" dy="302" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="Ubuntu" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+                    <mxGeometry x="90" y="280" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="Docker" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+                    <mxGeometry x="90" y="240" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="vLLM" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="90" y="170" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="K8s" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+                    <mxGeometry x="220" y="280" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="Deployment" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+                    <mxGeometry x="220" y="240" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="vLLM" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="220" y="170" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="Not Red Hat Supported" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+                    <mxGeometry x="610" y="350" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="Red Hat Supported" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="610" y="390" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="&lt;b&gt;Legend&lt;/b&gt;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="640" y="320" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="WvfaXDBC6hXOl4TVBY9i-25" value="RHEL" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="350" y="280" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="WvfaXDBC6hXOl4TVBY9i-26" value="Podman" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="350" y="240" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="WvfaXDBC6hXOl4TVBY9i-27" value="vLLM" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="350" y="170" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="WvfaXDBC6hXOl4TVBY9i-28" value="OpenShift" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="480" y="280" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="WvfaXDBC6hXOl4TVBY9i-29" value="Deployment" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="480" y="240" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="WvfaXDBC6hXOl4TVBY9i-30" value="vLLM" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="480" y="170" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="WvfaXDBC6hXOl4TVBY9i-31" value="OpenShift" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="610" y="280" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="WvfaXDBC6hXOl4TVBY9i-32" value="OpenShift AI Inference Server" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="610" y="240" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="WvfaXDBC6hXOl4TVBY9i-33" value="vLLM" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="610" y="170" width="120" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
