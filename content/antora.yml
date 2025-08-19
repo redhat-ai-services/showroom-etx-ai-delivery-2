@@ -1,12 +1,12 @@
 name: modules
-title: Default Title
-version: master
+title: ETX
+version: main
 nav:
   - modules/ROOT/nav.adoc
 
 asciidoc:
   attributes:
-    lab_name: "I'm the lab_name var"
+    lab_name: "AI Delivery 2"
     release-version: master
     page-pagination: true
     my_var: "foo"
