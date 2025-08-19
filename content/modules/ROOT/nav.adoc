@@ -1,7 +1,14 @@
-* xref:module-01.adoc[1. RPM Native Container]
-** xref:module-01.adoc#repositories[Repositories]
-** xref:module-01.adoc#software[Software]
+* xref:serving-at-scale/index.adoc[Serving at Scale]
+** xref:serving-at-scale/cluster-overview.adoc[Cluster Overview]
+** xref:serving-at-scale/advanced-vllm/index.adoc[Advanced VLLM]
+*** xref:serving-at-scale/advanced-vllm/llm-sizing.adoc[LLM Sizing]
+*** xref:serving-at-scale/advanced-vllm/single-node-multi-gpu.adoc[Lab: Multi-GPU vLLM]
+*** xref:serving-at-scale/advanced-vllm/multi-node-multi-gpu.adoc[Lab: Multi-Node vLLM]
+*** xref:serving-at-scale/advanced-vllm/kserve-gitops.adoc[Lab: GitOps with KServe]
 
-* xref:module-02.adoc[2. GitHub Sourced Container]
-** xref:module-02.adoc#prerequisites[Install Prerequisites]
-** xref:module-02.adoc#container[Enable Container]
+** xref:serving-at-scale/maas/index.adoc[Models as a Service]
+*** xref:serving-at-scale/maas/maas-lab.adoc[Lab: Models as a Service]
+
+** xref:ai-agentic/index.adoc[AI Agents]
+
+** xref:llm-optimization-and-inference/index.adoc[LLM Optimization and Inference]

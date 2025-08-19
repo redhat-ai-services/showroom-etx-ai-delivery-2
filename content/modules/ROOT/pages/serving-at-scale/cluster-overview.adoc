@@ -1,0 +1,77 @@
+= Cluster Overview
+
+A cluster has been provisioned for you to use in this lab.
+
+== Accessing the Cluster
+
+For this lab, you will need both the OpenShift Web Console and the OpenShift AI Dashboard.
+
+The OpenShift Web Console URL should have been provided to you when you registered for your cluster along with an `admin` password.
+
+To access the OpenShift AI Dashboard, you can find a link to the dashboard in the `tik-tak-toe` menu in the top right hand corner of the OpenShift Web Console.
+
+=== CLI Access
+
+Throughout the lab, you will need to use the OpenShift CLI to interact with the cluster.  You can generate a login command by clicking the `Copy Login Command` button in the top right hand corner of the OpenShift Web Console.
+
+Alternatively, the `Web Terminal` operator can be used to access the cluster via a web-based terminal.  This can be found in the "Terminal" icon in the top right hand corner of the OpenShift Web Console.
+
+== Node Topology
+
+The cluster has been provisioned with the following nodes:
+
+* 3x control-plane nodes (c6a.2xlarge)
+* 3x worker nodes (m6a.4xlarge)
+* 2x GPU nodes (g6.12xlarge)
+
+Each GPU node has 4x NVIDIA L4 GPUs with 24Gb of vRAM each.
+
+== Configured Operators 
+
+=== OpenShift AI Configuration
+
+OpenShift AI 2.22 has already been installed on the cluster with the following components enabled:
+
+* KServe
+* Workbenches
+* Dashboard
+* ModelMesh Serving
+* Data Science Pipelines
+
+=== OpenShift AI Dependencies
+
+OpenShift AI has the following dependencies installed:
+
+* Red Hat - Authorino Operator
+* Red Hat OpenShift Serverless
+* Red Hat Service Mesh 2
+
+=== GPU Operators
+
+The NVIDIA GPU Operator has been configured along with the Node Feature Discovery Operator to enable GPU support on the cluster.
+
+=== 3Scale
+
+The 3Scale Operator has been configured and an instance of 3Scale has been deployed to the cluster.
+
+=== Other Operators
+
+Several other operators have been made available on the cluster that will not be utilized during this section of the lab.  These include:
+
+* Red Hat OpenShift GitOps
+* Red Hat OpenShift Pipelines
+* Web Terminal
+* Advanced Cluster Management
+
+== Important Namespaces
+
+The following namespaces have already been provisioned on the cluster that we will use throughout this section of the lab:
+
+* `vllm` - This namespace is used to deploy the vLLM model server.
+* `3scale` - This namespace is where 3Scale is deployed.
+
+== Other things to Note
+
+For this lab, we have tried our best to help make the labs as seamless as possible.  A number of images have been pre-loaded into the cluster to help speed up the labs such as various ModelCar images, and we have also pre-loaded some models into the cluster.
+
+If you do encounter any issues throughout the lab, please reach out to the instructor for help.
