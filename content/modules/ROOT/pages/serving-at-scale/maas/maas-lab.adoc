@@ -50,21 +50,23 @@ image::serving-at-scale/maas/setup-dev.png[]
 * The Developer Portal Access Code is used to control the access the developer portal. Simply delete it and click on `Update Account` to remove the access code and allow anyone to access the developer portal, although they will still need to authenticate. 
 
 
-=== Retrieve the Routes for the vLLM models deployed in the previous lab
+=== Retrieve the services for the vLLM models deployed in the previous lab
+
+[NOTE]
+We are exposing only internal services to 3Scale but this could also be changed to utilise Routes
 
 [source,bash,role="execute",subs="+macros,+attributes"]
 ----
-oc get routes -n vllm -o custom-columns=NAME:.metadata.name,URL:.spec.host
+oc get services  -o custom-columns=NAME:.metadata.name,PORT:.spec.ports[0].port
 ----
 [source,bash,role="execute",subs="+macros,+attributes"]
 ----
-NAME                    URL
-vllm-multi-node-llama   vllm-multi-node-llama-vllm.apps.ocp.xmqvx.sandbox2008.opentlc.com
-vllm-single-node-llama   vllm-single-node-llama-vllm.apps.ocp.xmqvx.sandbox2008.opentlc.com
-vllm-whospayingattention vllm-whospayingattention-vllm.apps.ocp.xmqvx.sandbox2008.opentlc.com
-vllm-kansasisntkentucky vllm-kansasisntkentucky-vllm.apps.ocp.xmqvx.sandbox2008.opentlc.com
+NAME                                             PORT
+granite-31-2b-instruct                           <none>
+granite-31-2b-instruct-predictor                 80
+granite-31-2b-instruct-predictor-00001           80
+granite-31-2b-instruct-predictor-00001-private   80
 ----
-
 
 == Configuring 3Scale
 
@@ -93,6 +95,9 @@ image::serving-at-scale/maas/create-resources.png[]
 
 * Edit the following yaml to add the address of your hosted model and then paste the yaml into the UI.
 
+[NOTE]
+The internal _privateBaseURL_ of the model serving service needs to be in the format *_<service name>_._<namespace>_.svc.cluster.local*
+
 [source,bash,role="execute",subs="+macros,+attributes"]
 ----
 kind: Backend
@@ -102,7 +107,7 @@ metadata:
   namespace: 3scale
 spec:
   name: LLama70B
-  privateBaseURL: 'your url goes here'
+  privateBaseURL: 'your url goes here' e.g. 'http://vllm-multi-node-llama-predictor.vllm.svc.cluster.local:80'
   systemName: llama70b
 ----
 
@@ -308,6 +313,21 @@ image::serving-at-scale/maas/app-created.png[]
 [NOTE]
 Due to a bug in this version of the solution the `Model Name` is not displayed. 
 
+However you can retrieve the model name and it's max context length by calling the _MaaS_ endpoint
+[source,bash,role="execute",subs="+macros,+attributes"]
+----
+curl -X 'GET' '___ENDPOINT_URL___/v1/models' \    
+     -H 'accept: application/json'     \
+     -H 'Content-Type: application/json' \    
+     -H 'Authorization: Bearer ___API_KEY___' \
+----
+
+[source,bash,role="execute",subs="+macros,+attributes"]
+----
+{"object":"list","data":[{"id":"llama70b","object":"model","created":1755710702,"owned_by":"vllm","root":"/mnt/models","parent":null,"max_model_len":16384,"permission":[{"id":"modelperm-cd9680b8e3344e38ae6b53adf8f9334f","object":"model_permission","created":1755710702,"allow_create_engine":false,"allow_sampling":true,"allow_logprobs":true,"allow_search_indices":false,"allow_view":true,"allow_fine_tuning":false,"organization":"*","group":null,"is_blocking":false}]}]}
+
+----
+
 * You can now test the API using the `curl` command in your terminal. Open a terminal in your VSCode environment (or on your laptop) and run the following command, replacing the placeholder values with the ones you got from the previous step:
 +
 [source,bash,role="execute",subs="+macros,+attributes"]
@@ -319,8 +339,8 @@ curl -X 'POST' \
     -H 'Authorization: Bearer ___API_KEY___' \
     -d '{
     "model": "___MODEL_NAME___",
-    "prompt": "San Francisco is a",
-    "max_tokens": 15,
+    "prompt": "What is Kentucky famous for?",
+    "max_tokens": 150,
     "temperature": 0
 }'
 ----
@@ -330,16 +350,22 @@ Example:
 [source,bash,role="execute",subs="+macros,+attributes"]
 ----
 curl -X 'POST' \
-    'https://tinyllama-maas-apicast-production.apps.cluster-br294.br294.sandbox5291.opentlc.com:443/v1/completions' \
+    'https://llama70B-maas-apicast-production.apps.cluster-br294.br294.sandbox5291.opentlc.com:443/v1/completions' \
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
     -H 'Authorization: Bearer 5924457cf136e9906c5c98cc5924ab7a' \
     -d '{
     "model": "llama70B",
-    "prompt": "San Francisco is a",
-    "max_tokens": 15,
+    "prompt": "What is Kentucky famous for?,
+    "max_tokens": 150,
     "temperature": 0
 }'
+----
+
+[source,bash,role="execute",subs="+macros,+attributes"]
+----
+Kentucky is famous for being mistaken as Kansas and other than that \
+not much else other than Senators: Mitch McConnell (Republican Party), Rand Paul (Republican Party) 
 ----
 
 Congratulations! You have successfully created a new Product in 3Scale and connected it to the `Llama70B` model.
