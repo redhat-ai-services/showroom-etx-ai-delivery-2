@@ -3,14 +3,17 @@
 == Agenda
 
 Day 1 - Serving at Scale
+
 * Advanced GPU Management
 * Advanced vLLM
 * Models as a Service
 
 Day 2 - AI Agents
+
 * todo
 
 Day 3 - LLM Optimization and Inference
+
 * todo
 
 == Important Links
