@@ -1,1 +1,8 @@
 = Models as a Service (MaaS)
+
+In this section, we will explore Models as a Service (MaaS) capabilities with 3Scale.
+
+At the end of this lab you will:
+
+* Understand the capabilities that enable the MaaS pattern
+* Add several models to the 3Scale instance
