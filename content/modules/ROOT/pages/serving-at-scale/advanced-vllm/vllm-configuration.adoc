@@ -1,0 +1,85 @@
+= Advanced vLLM Configuration
+
+vLLM provides a number of options that can be set for the vLLM server using the arguments on the OpenShift AI Dashboard or the InferenceService object.
+
+To explore the available options, you can run `vllm --help` or refer to the docs here:
+
+https://docs.vllm.ai/en/latest/cli/index.html
+
+IMPORTANT: vLLM is a rapidly evolving project and customers may not be running the latest version of vLLM.  When referencing the upstream docs it is recommended that you look at the docs for the specific version of vLLM that you are running as the options may have changed.
+
+== Setting Arguments
+
+Arguments can be set directly through the UI for single-node vLLM instances.  Any configuration added to the UI is represented in the InferenceService object in the `args` field:
+
+```
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: my-model-server
+spec:
+  predictor:
+    model:
+      args:
+        - '--max-model-len=10000'
+```
+
+== Common Config Options
+
+=== Model Configs
+
+==== --served-model-name
+
+`--served-model-name` is set by default in the ServingRuntime to be equal to the name of the ServingRuntime object.  If you wish to override this name, you can set the argument manually and specify the model name you wish to utilize.
+
+==== Optimization Options
+
+==== --max-model-len
+
+`--max-model-len` is commonly used to help define the size of the KV Cache.  When attempting to run a model on a GPU that does not have enough vRAM to support the models default max context length you will need to set this value to limit the size of the KV Cache.
+
+==== --gpu-memory-utilization
+
+`--gpu-memory-utilization` is set to 90% by default.  You can increase this value to give the vLLM instance access to more vRAM.  vLLM generally does need a little bit of vRAM left free for some processes, but you can generally safely increase this value a bit to expand the size of the KV Cache, especially when using larger GPUs such as an H100 with 80Gb of vRAM.
+
+==== --enable-eager
+
+`--enable-eager` disables the creation of a CUDA graph that is used to improve performance of processing requests.  As a trade off for potentially slower responses, vLLM is able to free up additional vRAM which can be used to increase the size of the KV Cache.
+
+This option can be useful for increasing the overall size of the KV Cache when response time is not as important as a larger context length.
+
+==== --max-num-seqs
+
+`--max-num-seqs` can be used to set limits for how many concurrent requests are processed at any given time.  This option can be set to prevent the model server from creating contention issues and providing better response times for most users.
+
+==== --limit-mm-per-prompt
+
+`--limit-mm-per-prompt` is an option to limit the number of mutli-modal inputs per request.  This option can help to limit requests from sending too many large mutli-modal items which require a large number of resources to compute.
+
+=== Parallelism
+
+==== --tensor-parallel-size
+
+`--tensor-parallel-size` generally corresponds to the number of GPUs that are available for vLLM.
+
+==== --pipeline-parallel-size
+
+`--pipeline-parallel-size` is generally only used with multi-node configurations and corresponds to the number of node.
+
+==== --enable-expert-parallel
+
+`--enable-expert-parallel` can be used with MoE models to improve the way that models are sharded across GPUs.
+
+=== Tool Calling
+
+Tool calling is a common capability that we may need to enable on a vLLM instance using the following common commands:
+
+```
+--enable-auto-tool-choice 
+--tool-call-parser=granite
+--chat-template=/app/data/template/tool_chat_template_granite.jinja
+```
+
+`--enable-auto-tool-choice` turns on the ability to do tool calling.  `--tool-call-parser` is used to define what parser is used when doing tool calling.  In the example, we are using the `granite` parser, but other parsers exist that can be used with other models.  See the docs for what options are available.
+
+`--chat-template` generally corresponds to a template that is aligned with the model.  The templates can be found in the https://github.com/vllm-project/vllm/tree/main/examples[vLLM GitHub] and they should be pre-packaged in the vLLM container image in `/app/data/template/`.
