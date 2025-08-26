@@ -208,13 +208,25 @@ curl https://vllm-multi-node-llama-vllm.{openshift_cluster_ingress_domain}/v1/mo
 +
 [source,shell,role="execute"]
 ----
-curl -X POST https://vllm-multi-node-llama-vllm.{openshift_cluster_ingress_domain}/v1/chat/completions \
-    -H "Content-Type: application/json" \
-    -d '{
-      "model": "vllm-multi-node-llama",
-      "prompt": "Write a function in Python that determines if a number is prime.  Explain your approach.  Follow the PEP 8 style guide.",
-      "max_tokens": 500
-    }'
+curl -X 'POST' \
+'https://vllm-multi-node-llama-vllm.apps.ocp.xkgxf.sandbox659.opentlc.com/v1/chat/completions' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "model": "vllm-multi-node-llama",
+  "messages":[
+    {
+      "role": "system",
+      "content": "You'\''re an helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Write a function in Python that determines if a number is prime.  Explain your approach.  Follow the PEP 8 style guide."
+    }
+  ],
+  "max_tokens": 100
+}'
+
 ----
 
 +
