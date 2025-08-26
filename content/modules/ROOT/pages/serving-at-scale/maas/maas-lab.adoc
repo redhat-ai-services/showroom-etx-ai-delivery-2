@@ -57,7 +57,7 @@ We are exposing only internal services to 3Scale but this could also be changed 
 
 [source,bash,role="execute",subs="+macros,+attributes"]
 ----
-oc get services  -o custom-columns=NAME:.metadata.name,PORT:.spec.ports[0].port
+oc get services -n vllm -o custom-columns=NAME:.metadata.name,PORT:.spec.ports[0].port
 ----
 [source,bash,role="execute",subs="+macros,+attributes"]
 ----
