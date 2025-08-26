@@ -84,6 +84,7 @@ metadata:
   labels:
     networking.kserve.io/visibility: exposed # 2
   name: vllm-multi-node-llama
+  namespace: vllm
 spec:
   predictor:
     minReplicas: 1
