@@ -208,8 +208,7 @@ curl https://vllm-multi-node-llama-vllm.{openshift_cluster_ingress_domain}/v1/mo
 +
 [source,shell,role="execute"]
 ----
-curl -X 'POST' \
-'https://vllm-multi-node-llama-vllm.apps.ocp.xkgxf.sandbox659.opentlc.com/v1/chat/completions' \
+curl -X 'POST' 'https://vllm-multi-node-llama-vllm.{openshift_cluster_ingress_domain}/v1/chat/completions' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -226,7 +225,6 @@ curl -X 'POST' \
   ],
   "max_tokens": 100
 }'
-
 ----
 
 +
