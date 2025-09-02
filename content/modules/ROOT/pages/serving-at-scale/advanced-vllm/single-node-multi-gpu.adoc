@@ -314,8 +314,6 @@ nvidia-smi
 |  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
 |        ID   ID                                                               Usage      |
 |=========================================================================================|
-|    0   N/A  N/A             255      C   python                                21574MiB |
-|    1   N/A  N/A             267      C   python                                21574MiB |
 +-----------------------------------------------------------------------------------------+
 ----
 
@@ -324,9 +322,6 @@ The `nvidia-smi` command will output details about the GPUs available to the pod
 
 +
 You should see two GPUs available to the pod, and somewhere around 21574MiB of vRAM being utilized on each GPU.
-
-+
-Additionally you will see two `python` processes running, one for each GPU.
 
 . To exit the pod, use `ctrl+D` or type `exit`.
 
