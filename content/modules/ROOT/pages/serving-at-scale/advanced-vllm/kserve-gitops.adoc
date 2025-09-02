@@ -64,7 +64,7 @@ helm repo update redhat-ai-services
 +
 [source,bash,role="execute"]
 ----
-helm upgrade -i granite-guardian redhat-ai-services/vllm-kserve --version 0.5.9 \
+helm upgrade -i granite-guardian -n vllm redhat-ai-services/vllm-kserve --version 0.5.9 \
   --set fullnameOverride="granite-guardian" \
   --set image.tag="rhoai-2.22-cuda" \
   --set model.uri="oci://quay.io/redhat-ai-services/modelcar-catalog:granite-guardian-3.2-5b" \
@@ -102,8 +102,8 @@ In our previous lab sections, we deployed our models using the OpenShift AI Dash
 +
 [source,bash,role="execute"]
 ----
-oc delete inferenceservice granite-8b
-oc delete servingruntime granite-8b
+oc delete inferenceservice granite-8b -n vllm
+oc delete servingruntime granite-8b -n vllm
 ----
 
 +
@@ -121,7 +121,7 @@ If you are updating the objects using ArgoCD, these manually changes should not 
 +
 [source,bash,role="execute"]
 ----
-helm upgrade -i granite-8b redhat-ai-services/vllm-kserve --version 0.5.9 \
+helm upgrade -i granite-8b -n vllm redhat-ai-services/vllm-kserve --version 0.5.9 \
   --set fullnameOverride="granite-8b" \
   --set image.tag="rhoai-2.22-cuda" \
   --set model.uri="oci://quay.io/redhat-ai-services/modelcar-catalog:granite-3.3-8b-instruct" \
@@ -156,7 +156,7 @@ Refer to the answer below to compare your crafted command with the correct one.
 [%collapsible]
 ====
 ```
-helm upgrade -i vllm-multi-node-llama redhat-ai-services/vllm-kserve --version 0.5.9 \
+helm upgrade -i vllm-multi-node-llama -n vllm redhat-ai-services/vllm-kserve --version 0.5.9 \
   --set fullnameOverride="vllm-multi-node-llama" \
   --set image.tag="rhoai-2.22-cuda" \
   --set model.uri="pvc://llama-model/Llama-3.3-70B-Instruct-quantized.w4a16" \
