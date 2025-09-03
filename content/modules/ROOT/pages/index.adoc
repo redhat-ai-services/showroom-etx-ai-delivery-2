@@ -31,3 +31,21 @@ The cluster admin user can be used to access all of the resources on the cluster
 Cluster admin user: `{openshift_cluster_admin_username}`
 
 Cluster admin password: `{openshift_cluster_admin_password}`
+
+== Troubleshooting
+
+=== CSR Approval
+
+If you are having issues accessing the OpenShift Web Console you may need to approve the CSR for the cluster.
+
+To approve the CSR, login to the bastion host using the credentials provided from demo.redhat.com and run the following command:
+
+```bash
+for i in `oc get csr | grep Pending | awk '{print $1}'`
+do
+    echo "Certificate [$i] needs approval"
+    oc adm certificate approve $i
+done
+```
+
+It may take a few minutes after the CSR approvals complete for the OpenShift Web Console to be accessible.
