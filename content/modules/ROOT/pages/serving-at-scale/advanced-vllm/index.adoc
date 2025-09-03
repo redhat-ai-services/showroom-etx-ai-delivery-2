@@ -8,3 +8,4 @@ At the end of this lab you will:
 * Deploy a vLLM instance with multiple GPUs
 * Deploy a multi-node vLLM instance
 * Understand the basics of KServe objects and deploy a vLLM instance using Helm
+* Spin down resources when not in use

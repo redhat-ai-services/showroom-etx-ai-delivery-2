@@ -6,6 +6,7 @@
 *** xref:serving-at-scale/advanced-vllm/multi-node-multi-gpu.adoc[Lab: Multi-Node vLLM]
 *** xref:serving-at-scale/advanced-vllm/kserve-gitops.adoc[Lab: GitOps with KServe]
 *** xref:serving-at-scale/advanced-vllm/vllm-configuration.adoc[Advanced vLLM Configuration]
+*** xref:serving-at-scale/advanced-vllm/spinning-down-resources.adoc[Lab: Spinning Down Resources]
 
 ** xref:serving-at-scale/maas/index.adoc[Models as a Service]
 *** xref:serving-at-scale/maas/maas-lab.adoc[Lab: Models as a Service]
