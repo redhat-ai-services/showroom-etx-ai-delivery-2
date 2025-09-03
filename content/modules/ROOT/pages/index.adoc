@@ -10,11 +10,15 @@ Day 1 - Serving at Scale
 
 Day 2 - AI Agents
 
-* todo
+* Configuring the environment
+* Experimenting with LlamaStack Playground
+* Deploying a production ready Agent
 
 Day 3 - LLM Optimization and Inference
 
-* todo
+* Running performance benchmarks with GuideLLM
+* Running evaluation benchmarks with LMEval
+* Quantizing models with LLMCompressor
 
 == Important Links
 
