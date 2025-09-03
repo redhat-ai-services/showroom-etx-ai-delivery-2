@@ -64,9 +64,8 @@ helm repo update redhat-ai-services
 +
 [source,bash,role="execute"]
 ----
-helm upgrade -i granite-guardian -n vllm redhat-ai-services/vllm-kserve --version 0.5.9 \
+helm upgrade -i granite-guardian -n vllm redhat-ai-services/vllm-kserve --version 0.5.10 \
   --set fullnameOverride="granite-guardian" \
-  --set image.tag="rhoai-2.22-cuda-5e9c649953464aa3a668aba1774e42fc933f721b" \
   --set model.uri="oci://quay.io/redhat-ai-services/modelcar-catalog:granite-guardian-3.2-5b" \
   --set model.args={"--max-model-len=20000"} \
   --set deploymentMode=RawDeployment \
@@ -121,9 +120,8 @@ If you are updating the objects using ArgoCD, these manually changes should not 
 +
 [source,bash,role="execute"]
 ----
-helm upgrade -i granite-8b -n vllm redhat-ai-services/vllm-kserve --version 0.5.9 \
+helm upgrade -i granite-8b -n vllm redhat-ai-services/vllm-kserve --version 0.5.10 \
   --set fullnameOverride="granite-8b" \
-  --set image.tag="rhoai-2.22-cuda-5e9c649953464aa3a668aba1774e42fc933f721b" \
   --set model.uri="oci://quay.io/redhat-ai-services/modelcar-catalog:granite-3.3-8b-instruct" \
   --set 'resources.requests.cpu=4' \
   --set 'resources.limits.cpu=8' \
@@ -156,9 +154,8 @@ Refer to the answer below to compare your crafted command with the correct one.
 [%collapsible]
 ====
 ```
-helm upgrade -i vllm-multi-node-llama -n vllm redhat-ai-services/vllm-kserve --version 0.5.9 \
+helm upgrade -i vllm-multi-node-llama -n vllm redhat-ai-services/vllm-kserve --version 0.5.10 \
   --set fullnameOverride="vllm-multi-node-llama" \
-  --set image.tag="rhoai-2.22-cuda-5e9c649953464aa3a668aba1774e42fc933f721b" \
   --set model.uri="pvc://llama-model/Llama-3.3-70B-Instruct-quantized.w4a16" \
   --set servingTopology=multiNode \
   --set deploymentMode=RawDeployment \
