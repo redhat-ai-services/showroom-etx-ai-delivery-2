@@ -44,7 +44,7 @@ Now that our model servers are stopped, we can spin down the GPU nodes.
 +
 image::serving-at-scale/machinesets.png[MachineSets]
 
-. You should see three `g6.12xlarge` MachineSets.  The first two should show `1 of 1 machine` and the third should show `0 of 0 machines`.  Select the first MachineSet.
+. You should see three `g6.12xlarge` MachineSets.  The first two should show `1 of 1 machine` and the third should show `0 of 0 machines`.  Select the first MachineSet by clicking on the name of the MachineSet.
 
 . Click `1 machine` under the `Desired count` section and update the value to `0` the click `Save`.
 
