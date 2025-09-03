@@ -59,7 +59,7 @@ There is bug in the OpenShift Web Console that ships with OpenShift 4.18.6 that 
 
 . Repeat the process for the second MachineSet.
 
-. To verify the MachineSets have been scaled down, you can check the 
+. To verify the MachineSets have been scaled down, you can check the nodes in the cluster with the following command:
 
 +
 [source,bash,role="execute"]
@@ -76,8 +76,8 @@ You should see the two GPU nodes with the role `worker,worker-gpu` have the upda
 Every 2.0s: oc get nodes
 
 NAME                                        STATUS                     ROLES                  AGE   VERSION
-ip-10-0-16-211.us-east-2.compute.internal   Ready,SchedulingDisabled                      control-plane,master   28h   v1.31.6
-ip-10-0-16-5.us-east-2.compute.internal     Ready                      worker,worker-gpu      27h   v1.31.6
+ip-10-0-16-211.us-east-2.compute.internal   Ready                      control-plane,master   28h   v1.31.6
+ip-10-0-16-5.us-east-2.compute.internal     Ready,SchedulingDisabled   worker,worker-gpu      27h   v1.31.6
 ip-10-0-27-7.us-east-2.compute.internal     Ready                      worker                 27h   v1.31.6
 ip-10-0-38-61.us-east-2.compute.internal    Ready,SchedulingDisabled   worker,worker-gpu      27h   v1.31.6
 ip-10-0-47-130.us-east-2.compute.internal   Ready                      control-plane,master   28h   v1.31.6
