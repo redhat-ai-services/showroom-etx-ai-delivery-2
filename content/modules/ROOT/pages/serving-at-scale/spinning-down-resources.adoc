@@ -1,0 +1,93 @@
+# Lab: Spinning Down Resources
+
+In this section we will spin down some of the vLLM instances we have deployed, and bring down the GPU nodes to help save on the costs of the lab.
+
+During other sections of the lab you will bring back up the GPU nodes and the vLLM instances as needed.
+
+== Spinning Down the vLLM Instances
+
+As of OpenShift AI 2.22.1, we do not have the ability to scale down a Model server from the OpenShift AI Dashboard.  However, we can spin down the model server by adding an annotation to the InferenceService object.
+
+OpenShift AI 2.23 adds an option the the OpenShift AI Dashboard to scale down a Model server from the UI.
+
+. Run the following commands to add the annotation to the InferenceService objects to stop the model servers.
+
++
+[source,bash,role="execute"]
+----
+oc annotate inferenceservice granite-8b "serving.kserve.io/stop"="true" --overwrite -n vllm
+oc annotate inferenceservice granite-guardian "serving.kserve.io/stop"="true" --overwrite -n vllm
+oc annotate inferenceservice granite-vllm-multi-node-llama "serving.kserve.io/stop"="true" --overwrite -n vllm
+----
+
+. Verify the model servers successfully stop:
+
++
+[source,bash,role="execute"]
+----
+watch oc get pods -n vllm
+----
+
+You can spin a model server back up by setting the annotation value back to `false`:
+
+[source,bash,role="execute"]
+----
+oc annotate inferenceservice granite-8b "serving.kserve.io/stop"="false" --overwrite -n vllm
+----
+
+== Spinning Down the GPU Nodes
+
+Now that our model servers are stopped, we can spin down the GPU nodes.
+
+. Open the OpenShift Web Console and navigate to the `Compute` > `MachineSets` page.
+
++
+image::serving-at-scale/machinesets.png[MachineSets]
+
+. You should see three `g6.12xlarge` MachineSets.  The first two should show `1 of 1 machine` and the third should show `0 of 0 machines`.  Select the first MachineSet.
+
+. Click `1 machine` under the `Desired count` section and update the value to `0` the click `Save`.
+
++
+image::serving-at-scale/machineset-scaling.png[MachineSets Scaling]
+
++
+[TIP]
+====
+There is bug in the OpenShift Web Console that ships with OpenShift 4.18.6 that prevents you from clicking the `-` button to decrease the `Desired count` section to 0.  You can simply delete the number and type in `0` instead.
+====
+
+. Repeat the process for the second MachineSet.
+
+. To verify the MachineSets have been scaled down, you can check the 
+
++
+[source,bash,role="execute"]
+----
+watch oc get nodes
+----
+
++
+You should see the two GPU nodes with the role `worker,worker-gpu` have the update their status to `Ready,SchedulingDisabled`, then `NotReady,SchedulingDisabled`, and finally they will be removed from the nodes list.
+
++
+[source,bash]
+----
+Every 2.0s: oc get nodes
+
+NAME                                        STATUS                     ROLES                  AGE   VERSION
+ip-10-0-16-211.us-east-2.compute.internal   Ready,SchedulingDisabled                      control-plane,master   28h   v1.31.6
+ip-10-0-16-5.us-east-2.compute.internal     Ready                      worker,worker-gpu      27h   v1.31.6
+ip-10-0-27-7.us-east-2.compute.internal     Ready                      worker                 27h   v1.31.6
+ip-10-0-38-61.us-east-2.compute.internal    Ready,SchedulingDisabled   worker,worker-gpu      27h   v1.31.6
+ip-10-0-47-130.us-east-2.compute.internal   Ready                      control-plane,master   28h   v1.31.6
+ip-10-0-59-34.us-east-2.compute.internal    Ready                      worker                 27h   v1.31.6
+ip-10-0-65-191.us-east-2.compute.internal   Ready                      control-plane,master   28h   v1.31.6
+ip-10-0-75-29.us-east-2.compute.internal    Ready                      worker                 27h   v1.31.6
+----
+
+To spin the GPU nodes back up, you can update the `Desired count` section back to `1` and click `Save` for the MachineSets.
+
+== Conclusion
+
+Congratulations you have successfully spun down the our vLLM instances and the GPU nodes.
