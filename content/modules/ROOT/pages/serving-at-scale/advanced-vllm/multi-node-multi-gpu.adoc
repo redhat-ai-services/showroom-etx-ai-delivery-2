@@ -49,6 +49,7 @@ The OpenShift AI Dashboard provides several out of the box "Serving Runtimes" fo
 oc get servingruntime vllm-multinode-runtime -n vllm -o yaml
 ----
 
++
 [NOTE]
 ====
 As of 2.22 the `ServingRuntime` object must be named `vllm-multinode-runtime` in order for the odh-model-controller to automatically setup the Ray TLS certs needed for multi-node deployments.  In newer versions of RHOAI any name can be used for the model server.
@@ -63,6 +64,7 @@ oc get pvc llama-model -n vllm
 oc describe pvc llama-model -n vllm
 ----
 
++
 [NOTE]
 ====
 Multi-node vLLM supports both `ReadWriteMany` PVCs and ModelCar images for serving.  S3 buckets are not supported for multi-node deployments.
