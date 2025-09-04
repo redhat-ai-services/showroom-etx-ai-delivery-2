@@ -72,6 +72,14 @@ Multi-node vLLM supports both `ReadWriteMany` PVCs and ModelCar images for servi
 ReadWriteOnce PVCs are not supported for multi-node deployments since the PVC must be mounted to both the `head` and `worker` pods.
 ====
 
++
+[TIP]
+====
+In a real world scenario, you will need to create the PVC and download a copy of the model to the PVC.  The way you copy the model will likely depend on the environment you are working in and what you have access to.  
+
+If the model is already available on an S3 instance like in our cluster, you may wish to use a Job similar to the one that was already executed in your cluster to download the model to the PVC.  Alternatively, you could create a job that copies the model directly from HuggingFace to the PVC if you have access to HuggingFace from your cluster.  In some cases it may be easier to mount the PVC to a Workbench and copy the model to the PVC from the Workbench.
+====
+
 . Next, we will need to create the `InferenceService` object that will be used to serve the model.  Copy the following YAML into a file and create it on the cluster using `oc apply` or copy and paste it into the OpenShift Web Console using the `+` button in the top right corner of the screen.
 
 +
