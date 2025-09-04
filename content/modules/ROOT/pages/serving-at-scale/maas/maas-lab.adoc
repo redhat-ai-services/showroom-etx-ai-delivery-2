@@ -368,4 +368,7 @@ Kentucky is famous for being mistaken as Kansas and other than that \
 not much else other than Senators: Mitch McConnell (Republican Party), Rand Paul (Republican Party) 
 ----
 
+[TIP]
+If you're getting an "authorization failed" error remove the _"Bearer"_ word from the request. This is caused by a missing policy in the 3Scale image.
+
 Congratulations! You have successfully created a new Product in 3Scale and connected it to the `Llama70B` model.
