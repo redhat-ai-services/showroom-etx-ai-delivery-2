@@ -105,7 +105,7 @@ If you do wish to use the OCI option, you can simply set the pull secret as an e
 +
 [NOTE]
 ====
-You can find the image container for our model https://github.com/redhat-ai-services/modelcar-catalog/[here] alongside other ModelCar images that you can try.
+You can find the image container for our model https://quay.io/redhat-ai-services/modelcar-catalog[here] alongside other ModelCar images that you can try.
 
 Additionally, the source for building these ModelCar images can be found on https://github.com/redhat-ai-services/modelcar-catalog/[GitHub].
 
