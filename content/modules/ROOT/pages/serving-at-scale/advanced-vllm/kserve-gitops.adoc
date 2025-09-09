@@ -64,7 +64,7 @@ helm repo update redhat-ai-services
 +
 [source,bash,role="execute"]
 ----
-helm upgrade -i granite-guardian -n vllm redhat-ai-services/vllm-kserve --version 0.5.111 \
+helm upgrade -i granite-guardian -n vllm redhat-ai-services/vllm-kserve --version 0.5.11 \
   --set fullnameOverride="granite-guardian" \
   --set model.uri="oci://quay.io/redhat-ai-services/modelcar-catalog:granite-guardian-3.2-5b" \
   --set model.args={"--max-model-len=20000"} \
