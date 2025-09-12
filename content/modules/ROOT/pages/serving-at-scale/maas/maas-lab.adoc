@@ -135,7 +135,7 @@ spec:
       authentication:
         userkey:
           authUserKey: Authorization
-          credentials: headers
+          credentials: authorization
   backendUsages:
     llama70b:
       path: /
