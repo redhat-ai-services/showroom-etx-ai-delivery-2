@@ -107,7 +107,7 @@ metadata:
   namespace: 3scale
 spec:
   name: LLama70B
-  privateBaseURL: 'your url goes here' e.g. 'http://vllm-multi-node-llama-predictor.vllm.svc.cluster.local:80'
+  privateBaseURL: 'your url goes here' e.g. 'http://vllm-multi-node-llama-predictor.vllm.svc.cluster.local:8080'
   systemName: llama70b
 ----
 
