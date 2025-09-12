@@ -186,10 +186,6 @@ spec:
       version: builtin
     - configuration: {}
       enabled: true
-      name: remove-bearer
-      version: '0.1'
-    - configuration: {}
-      enabled: true
       name: apicast
       version: builtin
     - configuration:
